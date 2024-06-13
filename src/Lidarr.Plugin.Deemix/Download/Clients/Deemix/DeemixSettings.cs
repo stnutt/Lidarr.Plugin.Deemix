@@ -42,6 +42,9 @@ namespace NzbDrone.Core.Download.Clients.Deemix
         [FieldDefinition(4, Label = "Arl", Type = FieldType.Textbox)]
         public string Arl { get; set; }
 
+        [FieldDefinition(5, Label = "Do Not Remove Completed", Type = FieldType.Checkbox, Advanced = true)]
+        public bool DoNotRemoveCompleted { get; set; }
+
         public NzbDroneValidationResult Validate()
         {
             return new NzbDroneValidationResult(Validator.Validate(this));

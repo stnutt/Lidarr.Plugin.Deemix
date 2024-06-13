@@ -73,7 +73,7 @@ namespace NzbDrone.Core.Download.Clients.Deemix
             var queue = response.Queue.Values.Where(x => x.Status == "inQueue").OrderBy(x => response.QueueOrder.IndexOf(x.Id));
             var current = response.Current;
 
-            var result = completed.Concat(new[] { current }).Concat(queue).Where(x => x != null).Select(ToDownloadClientItem).ToList();
+            var result = completed.Concat(new[] { current }).Concat(queue).Where(x => x != null).Select(x => ToDownloadClientItem(x, settings)).ToList();
 
             var currentItem = result.FirstOrDefault(x => x.Status == DownloadItemStatus.Downloading);
 
@@ -130,7 +130,7 @@ namespace NzbDrone.Core.Download.Clients.Deemix
             throw new DownloadClientException("Error adding item to Deemix: {0}", response.Errid);
         }
 
-        private DownloadClientItem ToDownloadClientItem(DeemixQueueItem x)
+        private DownloadClientItem ToDownloadClientItem(DeemixQueueItem x, DeemixSettings settings)
         {
             var title = $"{x.Artist} - {x.Title} [WEB] {Formats[x.Bitrate]}";
             if (x.Explicit)
@@ -150,7 +150,7 @@ namespace NzbDrone.Core.Download.Clients.Deemix
                 RemainingTime = GetRemainingTime(x, size),
                 Status = GetItemStatus(x),
                 CanMoveFiles = true,
-                CanBeRemoved = true
+                CanBeRemoved = !settings.DoNotRemoveCompleted
             };
 
             if (x.ExtrasPath.IsNotNullOrWhiteSpace())
